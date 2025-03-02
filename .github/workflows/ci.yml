@@ -21,23 +21,27 @@ jobs:
           cache: "pnpm"
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
 
       - name: 📦 Install dependencies
         run: pnpm install
 
       - name: 🎨 Run Linter
-        run: pnpm run lint # Assumes linting is set up in package.json
+        run: pnpm run lint
 
       - name: 🧪 Run Tests
-        run: pnpm test # Assumes tests are set up in package.json
+        run: pnpm test
 
       - name: 📦 Build Project
-        run: pnpm run build # Assumes a build script (e.g., TypeScript build)
+        run: pnpm run build
 
   validate-devcontainer:
     name: 🔍 Validate Dev Container
     runs-on: ubuntu-latest
+    env:
+      DEVCONTAINERS_CLI_SKIP_MOUNTS: true
     steps:
       - name: 🚀 Checkout repository
         uses: actions/checkout@v4
@@ -46,9 +50,7 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           runCmd: "echo 'Dev Container validated successfully!'"
-          lockFile: "pnpm-lock.yaml"
-          # Instruct the CLI to skip processing mounts that won't be available on GitHub Actions.
-          extraArgs: "--skip-mounts"
+          configFile: ".devcontainer/devcontainer.json"
 
   lint-dockerfile:
     name: 🐳 Lint Dockerfile
