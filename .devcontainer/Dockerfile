@@ -1,12 +1,27 @@
 # Use Ubuntu base image from Dev Containers
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
 
+# Define package versions to pin (update these as needed for your Ubuntu version)
+ARG FISH_VERSION=3.4.1-1
+ARG JQ_VERSION=1.6-1
+ARG GIT_VERSION=1:2.25.1-1ubuntu3.2
+ARG UNZIP_VERSION=6.0-25ubuntu1
+ARG CURL_VERSION=7.68.0-1ubuntu2.12
+ARG RIPGREP_VERSION=11.0.2-1
+ARG SSH_VERSION=1:8.2p1-4ubuntu0.5
+
 # Avoid interactive dialogue during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies
+# Install system dependencies with pinned versions
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  fish jq git unzip curl ripgrep ssh \
+  fish=${FISH_VERSION} \
+  jq=${JQ_VERSION} \
+  git=${GIT_VERSION} \
+  unzip=${UNZIP_VERSION} \
+  curl=${CURL_VERSION} \
+  ripgrep=${RIPGREP_VERSION} \
+  ssh=${SSH_VERSION} \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Fish Shell Plugins
@@ -22,8 +37,11 @@ RUN mkdir -p /home/vscode/.ssh && \
   chmod 700 /home/vscode/.ssh && \
   chown -R vscode:vscode /home/vscode/.ssh
 
-# Set working directory
+# Set work directory
 WORKDIR /workspace
 
 # Switch to non-root user
 USER vscode
+
+# Start Fish by default
+CMD ["fish"]

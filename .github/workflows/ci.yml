@@ -18,19 +18,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
+          cache: "pnpm"
 
       - name: 📦 Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: 🎨 Run Linter
-        run: npm run lint # Assumes linting is set up in `package.json`
+        run: pnpm run lint # Assumes linting is set up in package.json
 
       - name: 🧪 Run Tests
-        run: npm test # Assumes tests are set up in `package.json`
+        run: pnpm test # Assumes tests are set up in package.json
 
       - name: 📦 Build Project
-        run: npm run build # Assumes TypeScript build setup
+        run: pnpm run build # Assumes a build script (e.g., TypeScript build)
 
   validate-devcontainer:
     name: 🔍 Validate Dev Container
@@ -43,6 +43,7 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           runCmd: "echo 'Dev Container validated successfully!'"
+          lockFile: "pnpm-lock.yaml"
 
   lint-dockerfile:
     name: 🐳 Lint Dockerfile
