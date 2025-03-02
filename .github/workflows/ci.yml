@@ -20,6 +20,9 @@ jobs:
           node-version: 18
           cache: "pnpm"
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: 📦 Install dependencies
         run: pnpm install
 
@@ -44,6 +47,8 @@ jobs:
         with:
           runCmd: "echo 'Dev Container validated successfully!'"
           lockFile: "pnpm-lock.yaml"
+          # Instruct the CLI to skip processing mounts that won't be available on GitHub Actions.
+          extraArgs: "--skip-mounts"
 
   lint-dockerfile:
     name: 🐳 Lint Dockerfile
