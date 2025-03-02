@@ -1,5 +1,5 @@
-import { RatesBlotterServer } from './server/server';
-import { ServerConfig } from './types';
+import { RatesBlotterServer } from './server';
+import { ServerConfig } from '../types';
 import dotenv from 'dotenv';
 
 // Load environment variables

@@ -1,131 +1,119 @@
-/**
- * Utilities for handling field-level delta updates for instruments
- */
+import { DeltaUpdate } from '../types';
+import { Instrument } from '../models/instrument';
+import { isEqual } from 'lodash';
 
 /**
- * Creates a delta update by comparing an original object with an updated one
- * Returns only the fields that have changed
+ * Generate a delta update object by comparing previous and current states
+ * of an instrument
  *
- * @param original The original object
- * @param updated The updated object
- * @returns An object containing only the changed fields
+ * @param previousState Previous instrument state
+ * @param currentState Current instrument state
+ * @returns Delta update object or null if no changes
  */
-export function createDelta<T extends Record<string, any>>(
-  original: T,
-  updated: T
-): Partial<T> {
-  const delta: Partial<T> = {};
-  let hasChanges = false;
+export function generateDeltaUpdate(
+  previousState: Instrument,
+  currentState: Instrument
+): DeltaUpdate | null {
+  if (!previousState || !currentState) {
+    return null;
+  }
 
-  // Compare each field in the updated object with the original
-  for (const key in updated) {
-    if (Object.prototype.hasOwnProperty.call(updated, key)) {
-      // Handle Date objects
-      if (updated[key] instanceof Date && original[key] instanceof Date) {
-        if (updated[key].getTime() !== original[key].getTime()) {
-          delta[key] = updated[key];
-          hasChanges = true;
-        }
-      }
-      // Handle arrays by comparing stringified versions (simple approach)
-      else if (Array.isArray(updated[key]) && Array.isArray(original[key])) {
-        if (JSON.stringify(updated[key]) !== JSON.stringify(original[key])) {
-          delta[key] = updated[key];
-          hasChanges = true;
-        }
-      }
-      // Handle objects (non-Date) recursively
-      else if (
-        typeof updated[key] === 'object' &&
-        updated[key] !== null &&
-        typeof original[key] === 'object' &&
-        original[key] !== null &&
-        !(updated[key] instanceof Date) &&
-        !(original[key] instanceof Date)
-      ) {
-        const nestedDelta = createDelta(original[key], updated[key]);
-        if (Object.keys(nestedDelta).length > 0) {
-          delta[key] = nestedDelta;
-          hasChanges = true;
-        }
-      }
-      // Handle primitive values
-      else if (updated[key] !== original[key]) {
-        delta[key] = updated[key];
-        hasChanges = true;
-      }
+  if (previousState.id !== currentState.id) {
+    return null; // Cannot generate delta for different instruments
+  }
+
+  const changes: Record<string, any> = {};
+
+  // Compare all fields in the current state
+  for (const key in currentState) {
+    // Skip the id field
+    if (key === 'id') continue;
+
+    // If the field has changed, add it to the changes object
+    if (!isEqual(previousState[key], currentState[key])) {
+      changes[key] = currentState[key];
     }
   }
 
-  return hasChanges ? delta : {};
-}
-
-/**
- * Applies a delta update to an object
- *
- * @param target The object to update
- * @param delta The delta containing changes to apply
- * @returns The updated object
- */
-export function applyDelta<T extends Record<string, any>>(
-  target: T,
-  delta: Partial<T>
-): T {
-  const result = { ...target };
-
-  for (const key in delta) {
-    if (Object.prototype.hasOwnProperty.call(delta, key)) {
-      const value = delta[key];
-
-      // Handle nested objects recursively
-      if (
-        typeof value === 'object' &&
-        value !== null &&
-        typeof result[key] === 'object' &&
-        result[key] !== null &&
-        !(value instanceof Date) &&
-        !(result[key] instanceof Date) &&
-        !Array.isArray(value) &&
-        !Array.isArray(result[key])
-      ) {
-        result[key] = applyDelta(result[key], value as any);
-      } else {
-        // Direct assignment for primitives, arrays, and Date objects
-        result[key] = value as any;
-      }
-    }
+  // If no changes were found, return null
+  if (Object.keys(changes).length === 0) {
+    return null;
   }
 
-  return result;
-}
-
-/**
- * Type representing a delta update
- */
-export interface DeltaUpdate<T> {
-  id: string;         // ID of the entity being updated
-  delta: Partial<T>;  // Fields that changed
-  timestamp: number;  // When the update occurred
-  isFullUpdate: boolean; // Whether this is a full update or a delta
-}
-
-/**
- * Creates a DeltaUpdate object from a delta
- *
- * @param id ID of the entity being updated
- * @param delta Fields that changed
- * @param isFullUpdate Whether this is a full update or a delta
- * @returns A DeltaUpdate object
- */
-export function createDeltaUpdate<T>(
-  id: string,
-  delta: Partial<T>,
-  isFullUpdate = false
-): DeltaUpdate<T> {
+  // Return the delta update
   return {
-    id,
-    delta,
+    instrumentId: currentState.id,
     timestamp: Date.now(),
-    isFullUpdate
+    fields: changes
   };
+}
+
+/**
+ * Apply a delta update to an instrument
+ *
+ * @param instrument Instrument to update
+ * @param deltaUpdate Delta update to apply
+ * @returns Updated instrument
+ */
+export function applyDeltaUpdate(
+  instrument: Instrument,
+  deltaUpdate: DeltaUpdate
+): Instrument {
+  if (!instrument || !deltaUpdate) {
+    return instrument;
+  }
+
+  if (instrument.id !== deltaUpdate.instrumentId) {
+    throw new Error('Cannot apply delta update to different instrument');
+  }
+
+  // Create a shallow copy of the instrument
+  const updatedInstrument = { ...instrument };
+
+  // Apply each field from the delta update
+  for (const key in deltaUpdate.fields) {
+    updatedInstrument[key] = deltaUpdate.fields[key];
+  }
+
+  return updatedInstrument;
+}
+
+/**
+ * Batch multiple delta updates into a single update message
+ *
+ * @param updates Array of delta updates
+ * @returns Batch update object
+ */
+export function batchDeltaUpdates(updates: DeltaUpdate[]): { updates: DeltaUpdate[], timestamp: number } {
+  return {
+    updates,
+    timestamp: Date.now()
+  };
+}
+
+/**
+ * Apply multiple delta updates to a collection of instruments
+ *
+ * @param instruments Map of instruments by ID
+ * @param updates Array of delta updates
+ * @returns Updated map of instruments
+ */
+export function applyBatchDeltaUpdates(
+  instruments: Map<string, Instrument>,
+  updates: DeltaUpdate[]
+): Map<string, Instrument> {
+  // Create a new map to avoid mutating the original
+  const updatedInstruments = new Map(instruments);
+
+  // Apply each update
+  for (const update of updates) {
+    const instrument = updatedInstruments.get(update.instrumentId);
+
+    if (instrument) {
+      const updatedInstrument = applyDeltaUpdate(instrument, update);
+      updatedInstruments.set(update.instrumentId, updatedInstrument);
+    }
+  }
+
+  return updatedInstruments;
 }
