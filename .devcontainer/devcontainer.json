@@ -49,12 +49,6 @@
   "remoteUser": "vscode",
   "mounts": [
     {
-      "source": "${localEnv:HOME}/.ssh",
-      "target": "/home/vscode/.ssh",
-      "type": "bind",
-      "options": ["readonly"]
-    },
-    {
       "source": "fish_history",
       "target": "/home/vscode/.local/share/fish",
       "type": "volume"
