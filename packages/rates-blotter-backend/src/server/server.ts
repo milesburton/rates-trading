@@ -11,7 +11,7 @@ import { ServerConfig } from '../types';
 
 export class RatesBlotterServer {
   private fastify: FastifyInstance;
-  private io: Server;
+  private io!: Server;
   private marketSimulator: MarketSimulator;
   private instrumentManager: InstrumentManager;
   private clientManager: ClientManager;

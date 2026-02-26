@@ -15,5 +15,10 @@
   },
   "dependencies": {
     "tsx": "^4.7.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

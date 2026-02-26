@@ -233,6 +233,22 @@ export function configureRoutes(
       // Set default values for required fields if not provided
       const now = new Date();
       const instrument: Instrument = {
+        // defaults for all required base fields
+        securityType: requestData.securityType,
+        fixedRate: requestData.fixedRate ?? 0,
+        floatingRateIndex: requestData.floatingRateIndex ?? "",
+        floatingRateSpread: requestData.floatingRateSpread ?? 0,
+        spread: requestData.spread ?? 0,
+        dayCountConvention: requestData.dayCountConvention,
+        paymentFrequency: requestData.paymentFrequency ?? 0,
+        settlementDays: requestData.settlementDays ?? 2,
+        currentMtm: requestData.currentMtm ?? 0,
+        isin: requestData.isin ?? "",
+        cusip: requestData.cusip ?? "",
+        sedol: requestData.sedol ?? "",
+        bbid: requestData.bbid ?? "",
+        ric: requestData.ric ?? "",
+        // provided fields
         instrumentId: requestData.instrumentId,
         description: requestData.description,
         notionalCurrency: requestData.notionalCurrency as Currency,
@@ -307,7 +323,9 @@ export function configureRoutes(
       if (updateData.rating) updates.rating = updateData.rating as CreditRating;
 
       // Include all other properties from updateData
-      Object.keys(updateData).forEach((key) => {
+      const updateDataRecord = updateData as unknown as Record<string, unknown>;
+      const updatesRecord = updates as unknown as Record<string, unknown>;
+      Object.keys(updateDataRecord).forEach((key) => {
         if (
           ![
             "securityType",
@@ -318,7 +336,7 @@ export function configureRoutes(
             "rating",
           ].includes(key)
         ) {
-          updates[key] = updateData[key];
+          updatesRecord[key] = updateDataRecord[key];
         }
       });
 

@@ -82,4 +82,4 @@ export interface InstrumentDates {
   settlementDate: Date; // When the trade settles
 }
 
-export { SecurityType, Currency, TradingStatus };
+export { SecurityType, Currency, TradingStatus, CreditRating, DayCountConvention };

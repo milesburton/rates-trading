@@ -31,7 +31,8 @@ export interface ClientState {
 }
 
 // Filter expression types using json-logic-js compatible structure
-export type FilterValue = string | number | boolean | null | FilterValue[] | Record<string, FilterValue>;
+export type FilterPrimitive = string | number | boolean | null;
+export type FilterValue = FilterPrimitive | FilterPrimitive[] | Record<string, FilterPrimitive>;
 
 export interface FilterExpression {
   [operator: string]: FilterValue;

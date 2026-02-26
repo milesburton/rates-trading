@@ -1,0 +1,187 @@
+/* =====================================================================
+   Rates Blotter — Dark Bloomberg-style theme
+   ===================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0d0f14;
+  --surface:   #13161e;
+  --border:    #222638;
+  --text:      #c8cde0;
+  --muted:     #5a607a;
+  --accent:    #4f7de8;
+  --up:        #22c55e;
+  --down:      #ef4444;
+  --flash-up:  rgba(34, 197, 94, 0.25);
+  --flash-down:rgba(239, 68, 68, 0.25);
+  font-size: 12px;
+  font-family: 'Consolas', 'Fira Mono', 'Monaco', monospace;
+  color: var(--text);
+  background: var(--bg);
+}
+
+body { background: var(--bg); }
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Status bar ─────────────────────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.status-group { display: flex; align-items: center; gap: 8px; }
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-label { color: var(--muted); }
+.instrument-count { color: var(--muted); }
+
+/* ── Toolbar ────────────────────────────────────────────────────────── */
+.blotter-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.filter-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 3px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  transition: all 0.1s;
+}
+.filter-btn:hover { border-color: var(--accent); color: var(--text); }
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.row-count { margin-left: auto; color: var(--muted); font-size: 11px; }
+
+/* ── Table ──────────────────────────────────────────────────────────── */
+.table-wrapper {
+  flex: 1;
+  overflow: auto;
+}
+
+.blotter-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.blotter-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface);
+}
+
+.blotter-table th {
+  padding: 5px 8px;
+  text-align: right;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.blotter-table th:first-child,
+.blotter-table th:nth-child(2),
+.blotter-table th:nth-child(3) {
+  text-align: left;
+}
+
+.blotter-table th.sortable { cursor: pointer; }
+.blotter-table th.sortable:hover { color: var(--text); }
+.blotter-table th.sortable.active { color: var(--accent); }
+
+.blotter-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(34, 38, 56, 0.6);
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.blotter-table tbody tr:hover td { background: rgba(79, 125, 232, 0.06); }
+
+.id-cell   { font-weight: 700; color: #e2e8f0; text-align: left; min-width: 90px; }
+.desc-cell { color: var(--muted); text-align: left; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.num-cell  { text-align: right; font-variant-numeric: tabular-nums; }
+
+.extra-label { color: var(--muted); font-size: 10px; text-align: right; }
+
+/* ── Type badges ────────────────────────────────────────────────────── */
+.type-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.type-GOVERNMENT_BOND  { background: rgba(79, 125, 232, 0.2); color: #7aa3f0; }
+.type-CORPORATE_BOND   { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+.type-INTEREST_RATE_SWAP { background: rgba(20, 184, 166, 0.2); color: #2dd4bf; }
+.type-FUTURE           { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+.type-OPTION           { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+/* ── P&L colours ────────────────────────────────────────────────────── */
+.positive { color: var(--up); }
+.negative { color: var(--down); }
+
+/* ── Flash animations ───────────────────────────────────────────────── */
+@keyframes flash-up {
+  0%   { background: var(--flash-up); }
+  100% { background: transparent; }
+}
+@keyframes flash-down {
+  0%   { background: var(--flash-down); }
+  100% { background: transparent; }
+}
+
+.flash-up   { animation: flash-up   0.6s ease-out forwards; color: var(--up) !important; }
+.flash-down { animation: flash-down 0.6s ease-out forwards; color: var(--down) !important; }
+
+/* ── Empty state ────────────────────────────────────────────────────── */
+.empty-row { text-align: center; color: var(--muted); padding: 24px !important; }
+
+/* ── Scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }

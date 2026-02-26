@@ -9,7 +9,8 @@ import { DeltaUpdate } from "../types";
 import { CreditRating, DayCountConvention } from "../models/enums";
 import { Option } from "../models/option";
 import { Future } from "../models/future";
-import { Bond, InterestRateSwap } from "../models";
+import { Bond } from "../models/bond";
+import { InterestRateSwap } from "../models/interestRateSwap";
 
 /**
  * Manages the collection of financial instruments
@@ -201,6 +202,19 @@ export class InstrumentManager {
       bondType: "Treasury",
       issueDate: "2023-03-31",
       nextCouponDate: "2023-09-30",
+      fixedRate: 4.25,
+      floatingRateIndex: "",
+      floatingRateSpread: 0,
+      spread: 0,
+      dayCountConvention: DayCountConvention.THIRTY_360,
+      paymentFrequency: 2,
+      settlementDays: 2,
+      currentMtm: 0,
+      isin: "US912828YJ43",
+      cusip: "912828YJ4",
+      sedol: "",
+      bbid: "US10Y",
+      ric: "US10YT=RR",
     };
 
     const bond2: Bond = {
@@ -245,6 +259,19 @@ export class InstrumentManager {
       bondType: "Treasury",
       issueDate: "2023-03-31",
       nextCouponDate: "2023-09-30",
+      fixedRate: 4.85,
+      floatingRateIndex: "",
+      floatingRateSpread: 0,
+      spread: 0,
+      dayCountConvention: DayCountConvention.THIRTY_360,
+      paymentFrequency: 2,
+      settlementDays: 2,
+      currentMtm: 0,
+      isin: "US912828YK16",
+      cusip: "912828YK1",
+      sedol: "",
+      bbid: "US2Y",
+      ric: "US2YT=RR",
     };
 
     // Add an Interest Rate Swap
@@ -296,8 +323,6 @@ export class InstrumentManager {
       sedol: "",
       bbid: "",
       ric: "",
-      settlementDate: "",
-      underlyingAsset: ""
     };
 
     // Add a Future contract
@@ -354,11 +379,6 @@ export class InstrumentManager {
       sedol: "",
       bbid: "",
       ric: "",
-      effectiveDate: "",
-      maturityDate: "",
-      settlementDate: "",
-      fixedLegDv01: 0,
-      floatingLegDv01: 0
     };
 
     // Add an Option
@@ -420,11 +440,6 @@ export class InstrumentManager {
       sedol: "",
       bbid: "",
       ric: "",
-      effectiveDate: "",
-      maturityDate: "",
-      settlementDate: "",
-      fixedLegDv01: 0,
-      floatingLegDv01: 0
     };
 
     instruments.push(bond1, bond2, swap1, future1, option1);

@@ -9,7 +9,7 @@ async function main() {
   try {
     // Load configuration from environment variables
     const config: ServerConfig = {
-      port: parseInt(process.env.PORT || '3000'),
+      port: parseInt(process.env.PORT || '3001'),
       host: process.env.HOST || '0.0.0.0',
       logLevel: (process.env.LOG_LEVEL as any) || 'info',
       corsOrigins: process.env.CORS_ORIGINS || true,
